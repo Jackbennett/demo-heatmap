@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=9">
+    <title>Heatmap</title>
+</head>
+<body style="text-align:center;font-family:'Segoe UI', Optima, Sans-Serif;">
+<h1>Heatmap Creator</h1>
+<h2>Move The Mouse </h2>
+
+<script src="js/simpleheat.js"></script>
+<script>
+window.requestAnimationFrame = (function() {
+    return window.requestAnimationFrame     ||
+        window.webkitRequestAnimationFrame  ||
+        window.mozRequestAnimationFrame     ||
+        window.msRequestAnimationFrame      ||
+        function( callback ) { return window.setTimeout( callback, 0); };
+})();
+
+window.cancelAnimationFrame = (function() {
+    return window.cancelAnimationFrame      ||
+        window.webkitCancelAnimationFrame   ||
+        window.mozCancelAnimationFrame      ||
+        window.msCancelAnimationFrame       ||
+        function( intervalKey ) { window.clearTimeout( intervalKey ); };
+})();
+
+window.onload = function(){
+
+    var el = document.createElement('canvas')
+    el.id = "canvas"
+    el.style.position = "absolute"
+    el.style.top = 0
+    el.style.left = 0
+    document.body.appendChild(el)
+
+    var heatmap = simpleheat('canvas').max(20),
+        frame
+
+    function draw(){
+        heatmap.draw()
+        frame = null
+    }
+    window.onresize = function(){
+        el.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth
+        el.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight
+        heatmap.resize()
+        heatmap.draw()
+    }
+    heatmap._canvas.onmousemove = heatmap._canvas.ontouchmove = function(e) {
+        // we need preventDefault for the touchmove
+        e.preventDefault();
+        console.log([e.clientX, e.clientY, 1])
+        heatmap.add([e.clientX, e.clientY, 1])
+        frame = frame || window.requestAnimationFrame(draw)
+    }
+    heatmap._canvas.onclick = function(e){
+        heatmap.add([e.clientX, e.clientY, 5])
+    }
+
+    window.onresize()
+
+}
+</script>
+</body>
+</html>
